@@ -31,7 +31,6 @@ class LmToolsUbuntu(LmToolsBase):
     def __init__(self):
         """ ctor
         """
-        LmToolsBase.__init__()
         self.os_supported.append('Ubuntu')
         self.hex_uuid_pattern = "usb-[0-9a-zA-Z_-]*_([0-9a-zA-Z]*)-.*"
         self.name_link_pattern = "(usb-[0-9a-zA-Z_-]*_[0-9a-zA-Z]*-.*$)"

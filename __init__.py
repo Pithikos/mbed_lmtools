@@ -56,3 +56,5 @@ def lmtools_os_info():
     return result
 
 lmtools = lmtools_factory()
+print lmtools.list_mbeds()
+
