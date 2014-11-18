@@ -38,12 +38,12 @@ class LmToolsUbuntu(LmToolsBase):
 
     def list_mbeds(self):
         result = None
-        disk_ids = get_dev_by_id('disk')
-        serial_ids = get_dev_by_id('serial')
+        disk_ids = self.get_dev_by_id('disk')
+        serial_ids = self.get_dev_by_id('serial')
         mount_ids = get_mounts()
 
-        mbeds = get_(tids, disk_ids, serial_ids, mount_ids)
-        orphans = get_not_detected(tids, disk_ids, serial_ids, mount_ids)
+        mbeds = self.get_(tids, disk_ids, serial_ids, mount_ids)
+        orphans = self.get_not_detected(tids, disk_ids, serial_ids, mount_ids)
         all_devices = mbeds + orphans
         return all_devices
         
@@ -74,6 +74,21 @@ class LmToolsUbuntu(LmToolsBase):
         retval = p.wait()
         return result
 
+    def get_disk_hex_ids(disk_list):
+        """ Get only hexadecimal IDs for mbed disks
+        """
+        nlp = re.compile(name_link_pattern)
+        hup = re.compile(hex_uuid_pattern)
+        disk_hex_ids = {}
+        for dl in disk_list:
+            m = nlp.search(dl)
+            if m and len(m.groups()):
+                disk_link = m.group(1)
+                m = hup.search(disk_link)
+                if m and len(m.groups()):
+                    disk_hex_ids[m.group(1)] = disk_link
+        return disk_hex_ids        
+        
     def get_(tids, disk_list, serial_list, mount_list):
         """ Find all known MBED devices
         """
@@ -83,7 +98,7 @@ class LmToolsUbuntu(LmToolsBase):
         mmp = re.compile(mount_media_pattern)
 
         # Find for all disk connected all MBED ones we know about from TID list
-        disk_hex_ids = get_disk_hex_ids(disk_list)
+        disk_hex_ids = self.get_disk_hex_ids(disk_list)
 
         # TODO: maybe not needed
         serial_hex_ids = []
@@ -140,7 +155,7 @@ class LmToolsUbuntu(LmToolsBase):
                     orphan_mbeds.append(disk)
 
         # Search for corresponding MBED serial
-        disk_hex_ids = get_disk_hex_ids(orphan_mbeds)   
+        disk_hex_ids = self.get_disk_hex_ids(orphan_mbeds)   
 
         result = []
         # FInd orphan serial name
