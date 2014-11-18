@@ -41,7 +41,7 @@ def lmtools_factory():
     os_info = lmtools_os_info()
     if (os_info[0] == 'nt' and os_info[1] == 'Windows'):
         result = LmToolsWin7()
-    elif (os_info[0] == 'Linux' and 'Ubuntu' in os_info[3]):
+    elif (os_info[0] == 'posix' and os_info[1] == 'Linux' and ('Ubuntu' in os_info[3])):
         result = LmToolsUbuntu()
     return result
 
@@ -55,4 +55,4 @@ def lmtools_os_info():
               sys.platform)
     return result
 
-print lmtools_os_info()
+lmtools = lmtools_factory()
