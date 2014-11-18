@@ -16,7 +16,7 @@ limitations under the License.
 """
 
 
-from mbed_lmtools.lmtools_base import LmToolsBase
+from lmtools_base import LmToolsBase
 import sys, os, re
 
 
@@ -35,14 +35,34 @@ class LmToolsWin7(LmToolsBase):
         
     """Returns connected mbeds as an mbeds dictionary
     """
-    def list_mbeds(self, manufacturer_ids):
-        mbeds = [(m[0], m[1], '', '') for m in
+    def list_mbeds(self, manufact_ids={}):
+        mbeds = []
+        for mbed in self.discover_connected_mbeds(manufact_ids):
+            d = {}
+            if mbed[0]:
+                d['mount_point'] = mbed[0]
+            else:
+                d['mount_point'] = None
+            if mbed[1]:
+                d['target_id'] = mbed[1]
+            else:
+                d['target_id'] = None
+            if mbed[2]:
+                d['serial_port'] = mbed[2]
+            else:
+                d['serial_port'] = None
+            if mbed[0]:
+                d['platform_name'] = mbed[3]
+            else:
+                d['platform_name'] = None
+            mbeds += [d]
+        return mbeds
 
     """Returns [(<mbed_mount_point>, <mbed_id>, <com port>, <board model>), ..]
       (notice that this function is permissive: adds new elements in-places when and if found)
     """
     def discover_connected_mbeds(self, defs={}):
-        mbeds = [(m[0], m[1], '', '') for m in self.get_connected_mbeds()]
+        mbeds = [(m[0], m[1], None, None) for m in self.get_connected_mbeds()]
         for i in range(len(mbeds)):
             mbed = mbeds[i]
             mnt, mbed_id = mbed[0], mbed[1]
@@ -160,7 +180,7 @@ class LmToolsWin7(LmToolsBase):
         for i in range(0, len(bin), 2):
             # bin[i] is str in Python2 and int in Python3
             if isinstance(bin[i], int):
-                if bin[i]<128:
+                if bin[i] < 128:
                     string += chr(bin[i])
             elif isinstance(bin[i], str):
                 string += bin[i]
