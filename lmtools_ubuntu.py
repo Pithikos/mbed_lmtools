@@ -49,7 +49,7 @@ class LmToolsUbuntu(LmToolsBase):
         
     # Private methods
 
-    def get_dev_by_id(subdir):
+    def get_dev_by_id(self, subdir):
         """ Lists disk devices by id
             Command: 'ls -oA /dev/disk/by-id/'
         """
@@ -62,7 +62,7 @@ class LmToolsUbuntu(LmToolsBase):
         retval = p.wait()
         return result
 
-    def get_mounts():
+    def get_mounts(self):
         """ Lists mounted devices with vfat file system (potential mbeds)
         """
         result = []
@@ -74,7 +74,7 @@ class LmToolsUbuntu(LmToolsBase):
         retval = p.wait()
         return result
 
-    def get_disk_hex_ids(disk_list):
+    def get_disk_hex_ids(self, disk_list):
         """ Get only hexadecimal IDs for mbed disks
         """
         nlp = re.compile(name_link_pattern)
@@ -89,7 +89,7 @@ class LmToolsUbuntu(LmToolsBase):
                     disk_hex_ids[m.group(1)] = disk_link
         return disk_hex_ids        
         
-    def get_(tids, disk_list, serial_list, mount_list):
+    def get_(self, tids, disk_list, serial_list, mount_list):
         """ Find all known MBED devices
         """
         # Regular expr. formulas
@@ -129,7 +129,7 @@ class LmToolsUbuntu(LmToolsBase):
                         result.append([mbed_name, mbed_dev_disk, mbed_mount_point, mbed_dev_serial, disk_hex_ids[dhi]])
         return result
 
-    def get_tid_mbed_name_remap(tids):
+    def get_tid_mbed_name_remap(self, tids):
         """ Remap to get TID -> mbed name mapping 
         """
         map_tid_to_mbed = {}
@@ -139,7 +139,7 @@ class LmToolsUbuntu(LmToolsBase):
                     map_tid_to_mbed[v] = key
         return map_tid_to_mbed
 
-    def get_not_detected(tids, disk_list, serial_list, mount_list):
+    def get_not_detected(self, tids, disk_list, serial_list, mount_list):
         """ Find all unknown mbed enabled devices
         """ 
         map_tid_to_mbed = get_tid_mbed_name_remap(tids)
