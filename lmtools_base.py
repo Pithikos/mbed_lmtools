@@ -34,7 +34,7 @@ class LmToolsBase:
     def list_mbeds(self):
         """ Gets information about mbeds connected to device
 
-        MBED
+        MBED_BOARD
         {
             'mount_point' : <>,
             'serial_port' : <>,
@@ -43,7 +43,7 @@ class LmToolsBase:
         }
         # If field unknown, place None
 
-        @return MBEDS = [ <MBED>, ]
+        @return MBED_BOARDS = [ <MBED_BOARD>, ]
 
         """
         return None
