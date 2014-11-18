@@ -40,7 +40,7 @@ class LmToolsUbuntu(LmToolsBase):
         result = None
         disk_ids = self.get_dev_by_id('disk')
         serial_ids = self.get_dev_by_id('serial')
-        mount_ids = get_mounts()
+        mount_ids = self.get_mounts()
 
         mbeds = self.get_(tids, disk_ids, serial_ids, mount_ids)
         orphans = self.get_not_detected(tids, disk_ids, serial_ids, mount_ids)
@@ -77,8 +77,8 @@ class LmToolsUbuntu(LmToolsBase):
     def get_disk_hex_ids(self, disk_list):
         """ Get only hexadecimal IDs for mbed disks
         """
-        nlp = re.compile(name_link_pattern)
-        hup = re.compile(hex_uuid_pattern)
+        nlp = re.compile(self.name_link_pattern)
+        hup = re.compile(self.hex_uuid_pattern)
         disk_hex_ids = {}
         for dl in disk_list:
             m = nlp.search(dl)
@@ -90,12 +90,12 @@ class LmToolsUbuntu(LmToolsBase):
         return disk_hex_ids        
         
     def get_(self, tids, disk_list, serial_list, mount_list):
-        """ Find all known MBED devices
+        """ Find all known mbed devices
         """
         # Regular expr. formulas
-        hup = re.compile(hex_uuid_pattern)
-        nlp = re.compile(name_link_pattern)
-        mmp = re.compile(mount_media_pattern)
+        hup = re.compile(self.hex_uuid_pattern)
+        nlp = re.compile(self.name_link_pattern)
+        mmp = re.compile(self.mount_media_pattern)
 
         # Find for all disk connected all MBED ones we know about from TID list
         disk_hex_ids = self.get_disk_hex_ids(disk_list)
