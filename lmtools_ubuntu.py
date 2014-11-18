@@ -42,6 +42,8 @@ class LmToolsUbuntu(LmToolsBase):
         serial_ids = self.get_dev_by_id('serial')
         mount_ids = self.get_mounts()
 
+        tids = {}
+
         mbeds = self.get_(tids, disk_ids, serial_ids, mount_ids)
         orphans = self.get_not_detected(tids, disk_ids, serial_ids, mount_ids)
         all_devices = mbeds + orphans
@@ -107,7 +109,7 @@ class LmToolsUbuntu(LmToolsBase):
             if m and len(m.groups()):
                 serial_hex_ids.append(m.group(1))
 
-        map_tid_to_mbed = get_tid_mbed_name_remap(tids)
+        map_tid_to_mbed = self.get_tid_mbed_name_remap(tids)
        
         result = []
 
@@ -142,7 +144,7 @@ class LmToolsUbuntu(LmToolsBase):
     def get_not_detected(self, tids, disk_list, serial_list, mount_list):
         """ Find all unknown mbed enabled devices
         """ 
-        map_tid_to_mbed = get_tid_mbed_name_remap(tids)
+        map_tid_to_mbed = self.get_tid_mbed_name_remap(tids)
         orphan_mbeds = []
         for disk in disk_list:
             if "mbed" in disk.lower():
@@ -169,6 +171,14 @@ class LmToolsUbuntu(LmToolsBase):
                     result.append([ "*not detected", orphan_dev_disk, orphan_mount_point, orphan_dev_serial, disk_hex_ids[dhi]])
         return result
 
+    def get_tid_mbed_name_remap(self, tids):
+        """ Remap to get TID -> mbed name mapping """
+        map_tid_to_mbed = {}
+        if tids:
+            for key in tids:
+                for v in tids[key]:
+                    map_tid_to_mbed[v] = key
+        return map_tid_to_mbed
 
 
 
