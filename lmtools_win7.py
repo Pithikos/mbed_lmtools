@@ -16,12 +16,7 @@ limitations under the License.
 """
 
 from lmtools_base import LmToolsBase
-
 import sys, os, re
-if sys.version_info[0]<3:
-	from _winreg import *
-else:
-	from winreg import *
 
 
 class LmToolsWin7(LmToolsBase):
@@ -30,11 +25,18 @@ class LmToolsWin7(LmToolsBase):
     def __init__(self):
         LmToolsBase.__init__()
         self.os_supported.append('Windows7')
+        if sys.version_info[0]<3:
+			import _winreg as winreg
+		else:
+			import winreg
+		self.winreg=winreg
 
 
-    # Returns [(<mbed_mount_point>, <mbed_id>, <com port>, <board model>), ..]
-    # (notice that this function is permissive: adds new elements in-places when and if found)
+    """Returns [(<mbed_mount_point>, <mbed_id>, <com port>, <board model>), ..]
+      (notice that this function is permissive: adds new elements in-places when and if found)
+    """
     def discover_connected_mbeds(defs):
+		
         mbeds=[(m[0], m[1], '', '') for m in get_connected_mbeds()]
         for i in range(len(mbeds)):
             mbed=mbeds[i]
@@ -49,25 +51,26 @@ class LmToolsWin7(LmToolsBase):
         return mbeds
     
     
-    # (This goes through a whole new loop, but this assures that even if
-    #  com is not detected, we still get the rest of info like mount point etc.)
+    """(This goes through a whole new loop, but this assures that even if
+        com is not detected, we still get the rest of info like mount point etc.)
+    """
     def get_mbed_com_port(id):
-        enum=OpenKey(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Enum')
-        usb_devs=OpenKey(enum, 'USB')
+        self.winreg.Enum=self.winreg.OpenKey(self.winreg.HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\self.winreg.Enum')
+        usb_devs=self.winreg.OpenKey(self.winreg.Enum, 'USB')
     
         # first try to find all devs keys (by id)
         dev_keys=[]
         for VID in iter_keys(usb_devs):
             try:
-                dev_keys+=[OpenKey(VID, id)]
+                dev_keys+=[self.winreg.OpenKey(VID, id)]
             except:
                 pass
     
         # then try to get port directly from "Device Parameters"
         for key in dev_keys:
             try:
-                param=OpenKey(key, "Device Parameters")
-                port=QueryValueEx(param, 'PortName')[0]
+                param=self.winreg.OpenKey(key, "Device Parameters")
+                port=self.winreg.QueryValueEx(param, 'PortName')[0]
                 return port
             except:
                 pass
@@ -76,7 +79,7 @@ class LmToolsWin7(LmToolsBase):
         for key in dev_keys:
             try:
                 ports=[]
-                parent_id=QueryValueEx(key, 'ParentIdPrefix')[0]
+                parent_id=self.winreg.QueryValueEx(key, 'ParentIdPrefix')[0]
                 for VID in iter_keys(usb_devs):
                     for dev in iter_keys_as_str(VID):
                         if parent_id in dev:
@@ -88,12 +91,14 @@ class LmToolsWin7(LmToolsBase):
                 pass
     
     
-    # Returns [(<mbed_mount_point>, <mbed_id>), ..]
+    """ Returns [(<mbed_mount_point>, <mbed_id>), ..]
+    """
     def get_connected_mbeds():
         return [m for m in get_mbeds() if os.path.exists(m[0])]
     
     
-    # Returns [(<mbed_mount_point>, <mbed_id>), ..]
+    """ Returns [(<mbed_mount_point>, <mbed_id>), ..]
+    """
     def get_mbeds():
         mbeds=[]
         for mbed in get_mbed_devices():
@@ -109,45 +114,52 @@ class LmToolsWin7(LmToolsBase):
     # =============================== Registry ====================================
     
     
-    # Iterate over subkeys of a key returning subkey as string
+    """ Iterate over subkeys of a key returning subkey as string
+    """
     def iter_keys_as_str(key):
-        for i in range(QueryInfoKey(key)[0]):
-            yield EnumKey(key, i)
+        for i in range(self.winreg.QueryInfoKey(key)[0]):
+            yield self.winreg.EnumKey(key, i)
 
 
-    # Iterate over subkeys of a key
+    """ Iterate over subkeys of a key
+    """
     def iter_keys(key):
-        for i in range(QueryInfoKey(key)[0]):
-            yield OpenKey(key, EnumKey(key, i))
+        for i in range(self.winreg.QueryInfoKey(key)[0]):
+            yield self.winreg.OpenKey(key, self.winreg.EnumKey(key, i))
 
  
-    # Iterate over values of a key
+    """ Iterate over values of a key
+    """
     def iter_vals(key):
-        for i in range(QueryInfoKey(key)[1]):
-            yield EnumValue(key, i)
+        for i in range(self.winreg.QueryInfoKey(key)[1]):
+            yield self.winreg.EnumValue(key, i)
 
 
-    # Get MBED devices (connected or not)
+    """ Get MBED devices (connected or not)
+    """
     def get_mbed_devices():
         return [d for d in get_dos_devices() if 'VEN_MBED' in d[1].upper()]
 
 
-    # Get DOS devices (connected or not)
+    """ Get DOS devices (connected or not)
+    """
     def get_dos_devices():
         ddevs=[dev for dev in get_mounted_devices() if 'DosDevices' in dev[0]]
         return [(d[0], regbin2str(d[1])) for d in ddevs]
 
 
-    # Get all mounted devices (connected or not)
+    """ Get all mounted devices (connected or not)
+    """
     def get_mounted_devices():
         devs=[]
-        mounts=OpenKey(HKEY_LOCAL_MACHINE, 'SYSTEM\MountedDevices')
-        for i in range(QueryInfoKey(mounts)[1]):
-            devs+=[EnumValue(mounts, i)]
+        mounts=self.winreg.OpenKey(self.winreg.HKEY_LOCAL_MACHINE, 'SYSTEM\MountedDevices')
+        for i in range(self.winreg.QueryInfoKey(mounts)[1]):
+            devs+=[self.winreg.EnumValue(mounts, i)]
         return devs
 
 
-    # Decode registry binary to readable string
+    """ Decode registry binary to readable string
+    """
     def regbin2str(bin):
         string=''
         for i in range(0, len(bin), 2):
