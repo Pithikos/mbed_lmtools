@@ -21,6 +21,7 @@ import sys, os, re
 
 
 class LmToolsWin7(LmToolsBase):
+
     """ LmToolsWin7 supports mbed enabled platforms detection across Windows7 OS family
     """
     def __init__(self):
@@ -138,7 +139,6 @@ class LmToolsWin7(LmToolsBase):
         ddevs = [dev for dev in self.get_mounted_devices() if 'DosDevices' in dev[0]]
         return [(d[0], self.regbin2str(d[1])) for d in ddevs]
 
-
     """ Get all mounted devices (connected or not)
     """
     def get_mounted_devices(self):
@@ -147,7 +147,6 @@ class LmToolsWin7(LmToolsBase):
         for i in range(self.winreg.QueryInfoKey(mounts)[1]):
             devs += [self.winreg.EnumValue(mounts, i)]
         return devs
-
 
     """ Decode registry binary to readable string
     """
