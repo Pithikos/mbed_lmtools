@@ -15,3 +15,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+class LmToolsBase:
+    """ Base class for lmtools used by test suite
+    """
+    def __init__(self):
+        """ ctor
+        """
+        pass
+
+    # Which OSs are supported by this module 
+    # Note: more than one OS can be supported by lmtools_* module
+    os_supported = []
+
+    # Interface
+    def get_mbeds(self):
+        """ Gets information about mbeds connected to device
+        """
+        return None
+
+    # Private part, methods used to drive interface functions
+    def load_mbed_description(self, file_name):
+        """ Loads JSON file with mbeds' description (mapping between target id and platform name)
+        """
+        pass

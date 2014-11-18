@@ -1,0 +1,17 @@
+# Python compiled sources
+*.py[cod]
+
+# MANIFEST file
+MANIFEST
+
+# Eclipse Project Files
+.cproject
+.project
+.pydevproject
+
+# Packages
+*.egg
+*.egg-info
+
+# JSON metadata
+.json

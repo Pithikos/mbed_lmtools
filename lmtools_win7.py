@@ -15,3 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+from lmtools_base import LmToolsBase
+
+
+class LmToolsWin7(LmToolsBase):
+    """ LmToolsWin7 supports mbed enabled platforms detection across Windows7 OS family
+    """
+    def __init__(self):
+        LmToolsBase.__init__()
+        self.os_supported.append('Windows7')
