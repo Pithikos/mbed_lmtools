@@ -15,11 +15,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from lmtools_win7 import LmToolWin7
-from lmtools_ubuntu import LmToolUbuntu
+from lmtools_win7 import LmToolsWin7
+from lmtools_ubuntu import LmToolsUbuntu
 
+"""
+Example usage:
+
+lmtools = lmtools_factory()
+lmtools.load_mbed_description('targets.json')
+lm = lmtools.list_mbeds()
+
+for mbed in lm:
+    print mbed['serial_port']
+"""
 
 def lmtools_factory():
     """ Factory producing lmtools depending on OS it is working on
     """
     pass
+
+    

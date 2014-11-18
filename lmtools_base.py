@@ -27,17 +27,41 @@ class LmToolsBase:
     # Note: more than one OS can be supported by lmtools_* module
     os_supported = []
 
+    # Dictionary describing mapping between manufacturers' ids and platform name.
+    manufacture_ids = {}
+
     # Interface
-    def get_mbeds(self):
+    def list_mbeds(self):
         """ Gets information about mbeds connected to device
+
+        MBED
+        {
+            'mount_point' : <>,
+            'serial_port' : <>,
+            'target_id' : <>,
+            'platform_name' : <>,
+        }
+        # If field unknown, place None
+
+        @return MBEDS = [ <MBED>, ]
+
         """
         return None
 
     # Private part, methods used to drive interface functions
     def load_mbed_description(self, file_name):
         """ Loads JSON file with mbeds' description (mapping between target id and platform name)
+            Sets self.manufacture_ids with mapping between manufacturers' ids and platform name.
         """
+        self.manufacture_ids = {}   # TODO: load this values from file
         pass
+
+    def err(self, text):
+        """ Prints error messages
+        """
+        print text
+
+    # Private functions supporting API
 
     def get_json_data_from_file(json_spec_filename, verbose=False):
         """ Loads from file JSON formatted string to data structure
