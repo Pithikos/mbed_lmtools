@@ -23,7 +23,7 @@ class LmToolsBase:
         """
         pass
 
-    # Which OSs are supported by this module 
+    # Which OSs are supported by this module
     # Note: more than one OS can be supported by lmtools_* module
     os_supported = []
 
@@ -38,3 +38,19 @@ class LmToolsBase:
         """ Loads JSON file with mbeds' description (mapping between target id and platform name)
         """
         pass
+
+    def get_json_data_from_file(json_spec_filename, verbose=False):
+        """ Loads from file JSON formatted string to data structure
+            @return None if JSON can be loaded
+        """
+        result = None
+        try:
+            with open(json_spec_filename) as data_file:
+                try:
+                    result = json.load(data_file)
+                except ValueError as json_error_msg:
+                    result = None
+                    print "Error parsing TID file(%s): %s" % (json_spec_filename, json_error_msg)
+        except IOError as fileopen_error_msg:
+            print "Warning: %s" % (fileopen_error_msg)
+        return result

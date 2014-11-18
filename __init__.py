@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from lmtoold_win7 import LmToolWin7
-from lmtoold_ubuntu import LmToolUbuntu
+from lmtools_win7 import LmToolWin7
+from lmtools_ubuntu import LmToolUbuntu
 
 
 def lmtools_factory():
