@@ -15,6 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import os
+import sys
+import platform
+
 from lmtools_win7 import LmToolsWin7
 from lmtools_ubuntu import LmToolsUbuntu
 
@@ -29,9 +33,26 @@ for mbed in lm:
     print mbed['serial_port']
 """
 
+
 def lmtools_factory():
     """ Factory producing lmtools depending on OS it is working on
     """
-    pass
+    result = None
+    os_info = lmtools_os_info()
+    if (os_info[0] == 'nt' and os_info[1] == 'Windows'):
+        result = LmToolsWin7()
+    elif (os_info[0] == 'Linux' and 'Ubuntu' in os_info[3]):
+        result = LmToolsUbuntu()
+    return result
 
-    
+def lmtools_os_info():
+    """ returns information about running OS
+    """
+    result = (os.name,
+              platform.system(),
+              platform.release(),
+              platform.version(),
+              sys.platform)
+    return result
+
+print lmtools_os_info()
