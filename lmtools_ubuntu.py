@@ -48,7 +48,7 @@ class LmToolsUbuntu(LmToolsBase):
         orphans = self.get_not_detected(tids, disk_ids, serial_ids, mount_ids)
         all_devices = mbeds + orphans
         return all_devices
-        
+
     # Private methods
 
     def get_dev_by_id(self, subdir):
@@ -89,8 +89,20 @@ class LmToolsUbuntu(LmToolsBase):
                 m = hup.search(disk_link)
                 if m and len(m.groups()):
                     disk_hex_ids[m.group(1)] = disk_link
-        return disk_hex_ids        
-        
+        return disk_hex_ids
+
+    def get_mbed_serial(self, serial_list, dhi):
+        """ Get mbed serial by unique hex id (dhi) in disk name  """
+        nlp = re.compile(name_link_pattern)
+        for sl in serial_list:
+            if dhi in sl:
+                m = nlp.search(sl)
+                if m and len(m.groups()):
+                    serial_link = m.group(1)
+                    mbed_dev_serial = "/dev/" + self.get_dev_name(serial_link)
+                    return mbed_dev_serial
+        return None
+
     def get_(self, tids, disk_list, serial_list, mount_list):
         """ Find all known mbed devices
         """
@@ -110,10 +122,10 @@ class LmToolsUbuntu(LmToolsBase):
                 serial_hex_ids.append(m.group(1))
 
         map_tid_to_mbed = self.get_tid_mbed_name_remap(tids)
-       
+
         result = []
 
-        # Search if we have 
+        # Search if we have
         for dhi in disk_hex_ids.keys():
             for mttm in map_tid_to_mbed.keys():
                 if dhi in mttm:
@@ -123,8 +135,8 @@ class LmToolsUbuntu(LmToolsBase):
 
                     disk_link = disk_hex_ids[dhi]
                     # print "Fount MBED disk: " + disk_link #mbed_name + ": " + mttm + " (" + dhi + ")"
-                    mbed_dev_disk = get_dev_name(disk_link) # m.group(1) if m and len(m.groups()) else "unknown"
-                    mbed_dev_serial = get_mbed_serial(serial_list, dhi)
+                    mbed_dev_disk = self.get_dev_name(disk_link) # m.group(1) if m and len(m.groups()) else "unknown"
+                    mbed_dev_serial = self.get_mbed_serial(serial_list, dhi)
                     # Print detected device
                     mbed_mount_point = get_mount_point(mbed_dev_disk, mount_list)
                     if mbed_mount_point and  mbed_dev_serial:
@@ -132,7 +144,7 @@ class LmToolsUbuntu(LmToolsBase):
         return result
 
     def get_tid_mbed_name_remap(self, tids):
-        """ Remap to get TID -> mbed name mapping 
+        """ Remap to get TID -> mbed name mapping
         """
         map_tid_to_mbed = {}
         if tids:
@@ -143,7 +155,7 @@ class LmToolsUbuntu(LmToolsBase):
 
     def get_not_detected(self, tids, disk_list, serial_list, mount_list):
         """ Find all unknown mbed enabled devices
-        """ 
+        """
         map_tid_to_mbed = self.get_tid_mbed_name_remap(tids)
         orphan_mbeds = []
         for disk in disk_list:
@@ -157,15 +169,15 @@ class LmToolsUbuntu(LmToolsBase):
                     orphan_mbeds.append(disk)
 
         # Search for corresponding MBED serial
-        disk_hex_ids = self.get_disk_hex_ids(orphan_mbeds)   
+        disk_hex_ids = self.get_disk_hex_ids(orphan_mbeds)
 
         result = []
         # FInd orphan serial name
         for dhi in disk_hex_ids:
-            orphan_serial = get_mbed_serial(serial_list, dhi)
+            orphan_serial = self.get_mbed_serial(serial_list, dhi)
             if orphan_serial:
-                orphan_dev_disk = get_dev_name(disk_hex_ids[dhi])
-                orphan_dev_serial = "/dev/" + get_dev_name(orphan_serial)
+                orphan_dev_disk = self.get_dev_name(disk_hex_ids[dhi])
+                orphan_dev_serial = "/dev/" + self.get_dev_name(orphan_serial)
                 orphan_mount_point = get_mount_point(orphan_dev_disk, mount_list)
                 if orphan_mount_point and orphan_dev_serial:
                     result.append([ "*not detected", orphan_dev_disk, orphan_mount_point, orphan_dev_serial, disk_hex_ids[dhi]])
@@ -180,6 +192,14 @@ class LmToolsUbuntu(LmToolsBase):
                     map_tid_to_mbed[v] = key
         return map_tid_to_mbed
 
+    def get_dev_name(self, link):
+        """ Get device name from symbolic link list
+        """
+        device_sufix_pattern = ".*/([a-zA-Z0-9]*)$"
+        dsp = re.compile(device_sufix_pattern)
+        m = dsp.search(link)
+        mbed_dev = m.group(1) if m and len(m.groups()) else "unknown"
+        return mbed_dev
 
 
 
