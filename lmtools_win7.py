@@ -55,7 +55,8 @@ class LmToolsWin7(LmToolsBase):
         com is not detected, we still get the rest of info like mount point etc.)
     """
     def get_mbed_com_port(self, id):
-        self.winreg.Enum=self.winreg.OpenKey(self.winreg.HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Enum')
+        self.winreg.Enum=self.winreg.OpenKey(self.winreg.HKEY_LOCAL_MACHINE, \
+                                            'SYSTEM\CurrentControlSet\Enum')
         usb_devs=self.winreg.OpenKey(self.winreg.Enum, 'USB')
     
         # first try to find all devs keys (by id)
@@ -83,7 +84,7 @@ class LmToolsWin7(LmToolsBase):
                 for VID in self.iter_keys(usb_devs):
                     for dev in self.iter_keys_as_str(VID):
                         if parent_id in dev:
-                            ports+=[get_mbed_com_port(dev)]
+                            ports+=[self.get_mbed_com_port(dev)]
                 for port in ports:
                     if port:
                         return port
